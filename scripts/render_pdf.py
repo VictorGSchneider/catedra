@@ -54,7 +54,7 @@ story.append(Paragraph("Link do GitHub", label))
 story.append(Paragraph("https://github.com/victorgschneider/catedra", value))
 
 story.append(Paragraph("Link do Gestor de Projetos", label))
-story.append(Paragraph("[inserir link do GitHub Projects]", value))
+story.append(Paragraph("https://github.com/users/VictorGSchneider/projects/4", value))
 
 story.append(Paragraph("Funcionalidade Inovadora (resumo)", label))
 inov = (

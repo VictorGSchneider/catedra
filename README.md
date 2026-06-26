@@ -26,7 +26,7 @@ recebe informação e gerencia tarefas, reduzindo sobrecarga e evasão.
 ## Links
 
 - **Repositório GitHub:** <https://github.com/victorgschneider/catedra>
-- **Gestor de Projetos (GitHub Projects):** <!-- PREENCHER -->
+- **Gestor de Projetos (GitHub Projects):** <https://github.com/users/VictorGSchneider/projects/4>
 
 ## Estrutura do repositório
 
