@@ -1,0 +1,31 @@
+@startuml containers
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Cátedra — C4 Nível 2: Diagrama de Containers
+
+Person(estudante, "Estudante", "Usa a plataforma pelo navegador.")
+Person(professor, "Professor", "Usa a plataforma pelo navegador.")
+
+System_Boundary(catedra, "Cátedra") {
+    Container(spa, "Aplicação Web (SPA)", "Vue.js", "Interface no navegador para todos os papéis.")
+    Container(api, "API", "FastAPI / Python", "Camada de aplicação e domínio: regras de negócio, autenticação (JWT) e autorização (RBAC).")
+    ContainerDb(db, "Banco de Dados", "PostgreSQL", "Turmas, matrículas, atividades, entregas, notas e preferências de notificação.")
+    Container(bus, "Barramento de Eventos", "Redis Pub/Sub", "Distribui eventos do domínio (entrega criada, nota publicada, aviso postado).")
+    Container(notif, "Serviço de Notificação", "Worker Python", "Consome eventos e aplica a cadência por estudante (Modo Foco).")
+}
+
+System_Ext(email, "Serviço de E-mail", "SMTP")
+System_Ext(storage, "Object Storage", "S3 / MinIO")
+
+Rel(estudante, spa, "Usa", "HTTPS")
+Rel(professor, spa, "Usa", "HTTPS")
+Rel(spa, api, "Faz chamadas", "JSON/HTTPS")
+Rel(api, db, "Lê e escreve", "SQL")
+Rel(api, storage, "Armazena/recupera anexos", "S3 API")
+Rel(api, bus, "Publica eventos")
+Rel(bus, notif, "Entrega eventos")
+Rel(notif, db, "Lê preferências de cadência", "SQL")
+Rel(notif, email, "Envia avisos", "SMTP")
+
+SHOW_LEGEND()
+@enduml

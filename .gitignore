@@ -1,0 +1,18 @@
+# Ferramenta externa — baixe em https://plantuml.com/download
+plantuml.jar
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+
+# Observação: os artefatos renderiados (*.png, *.bpmn, ENTREGA-catedra.pdf)
+# SÃO versionados de propósito, para ficarem visíveis no GitHub.

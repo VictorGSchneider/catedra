@@ -1,0 +1,24 @@
+@startuml contexto
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title Cátedra — C4 Nível 1: Diagrama de Contexto
+
+Person(estudante, "Estudante", "Acompanha turmas, entrega atividades e consulta notas.")
+Person(professor, "Professor", "Cria turmas e atividades, corrige entregas e lança notas.")
+Person(coordenador, "Coordenador", "Acompanha as turmas do curso (somente leitura).")
+Person(admin, "Administrador", "Gerencia usuários, papéis e a operação da plataforma.")
+
+System(catedra, "Cátedra", "Plataforma de gestão de sala de aula online: turmas, atividades, entregas, notas e notificações adaptativas.")
+
+System_Ext(email, "Serviço de E-mail", "Entrega notificações por e-mail aos usuários.")
+System_Ext(storage, "Object Storage", "Armazena anexos de atividades e entregas.")
+
+Rel(estudante, catedra, "Usa")
+Rel(professor, catedra, "Usa")
+Rel(coordenador, catedra, "Consulta")
+Rel(admin, catedra, "Administra")
+Rel(catedra, email, "Envia notificações", "SMTP")
+Rel(catedra, storage, "Guarda/recupera arquivos", "S3 API")
+
+SHOW_LEGEND()
+@enduml

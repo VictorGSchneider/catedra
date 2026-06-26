@@ -1,0 +1,655 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_Catedra" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Claude AI" exporterVersion="1.0">
+  <bpmn:collaboration id="Collaboration_Catedra">
+    <bpmn:participant id="Pool_EntregaCorrecao" name="Entrega e Correção de Atividade" processRef="Process_EntregaCorrecao" />
+    <bpmn:participant id="Pool_ModoFoco" name="Notificações Adaptativas (Modo Foco)" processRef="Process_ModoFoco" />
+    <bpmn:participant id="Pool_FormacaoGrupo" name="Formação de Grupo de Trabalho" processRef="Process_FormacaoGrupo" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_EntregaCorrecao" name="Entrega e Correção de Atividade" isExecutable="true">
+    <bpmn:laneSet id="LaneSet_Process_EntregaCorrecao">
+      <bpmn:lane id="Lane_Professor" name="Professor">
+        <bpmn:flowNodeRef>Start_AtividadePronta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_PublicarAtividade</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CorrigirEntrega</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_PublicarNota</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_SistemaEC" name="Sistema">
+        <bpmn:flowNodeRef>Task_NotificarTurma</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gw_DentroPrazo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RegistrarEntregue</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RegistrarAtrasada</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_EmitirEvento</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Estudante" name="Estudante">
+        <bpmn:flowNodeRef>Task_EnviarEntrega</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ConsultarNota</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Fim</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_AtividadePronta" name="Atividade pronta">
+      <bpmn:outgoing>f1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_PublicarAtividade" name="Publicar atividade (com prazo)">
+      <bpmn:incoming>f1</bpmn:incoming>
+      <bpmn:outgoing>f2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sendTask id="Task_NotificarTurma" name="Notificar estudantes (cadência)">
+      <bpmn:incoming>f2</bpmn:incoming>
+      <bpmn:outgoing>f3</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:userTask id="Task_EnviarEntrega" name="Elaborar e enviar entrega">
+      <bpmn:incoming>f3</bpmn:incoming>
+      <bpmn:outgoing>f4</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gw_DentroPrazo" name="Dentro do prazo?">
+      <bpmn:incoming>f4</bpmn:incoming>
+      <bpmn:outgoing>f5</bpmn:outgoing>
+      <bpmn:outgoing>f6</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_RegistrarEntregue" name="Registrar como Entregue">
+      <bpmn:incoming>f5</bpmn:incoming>
+      <bpmn:outgoing>f7</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_RegistrarAtrasada" name="Registrar como Atrasada">
+      <bpmn:incoming>f6</bpmn:incoming>
+      <bpmn:outgoing>f8</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="Task_CorrigirEntrega" name="Corrigir entrega">
+      <bpmn:incoming>f7</bpmn:incoming>
+      <bpmn:incoming>f8</bpmn:incoming>
+      <bpmn:outgoing>f9</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_PublicarNota" name="Publicar nota">
+      <bpmn:incoming>f9</bpmn:incoming>
+      <bpmn:outgoing>f10</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sendTask id="Task_EmitirEvento" name="Emitir evento e notificar">
+      <bpmn:incoming>f10</bpmn:incoming>
+      <bpmn:outgoing>f11</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:userTask id="Task_ConsultarNota" name="Consultar nota e feedback">
+      <bpmn:incoming>f11</bpmn:incoming>
+      <bpmn:outgoing>f12</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="End_Fim" name="Fim">
+      <bpmn:incoming>f12</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="f1" sourceRef="Start_AtividadePronta" targetRef="Task_PublicarAtividade" />
+    <bpmn:sequenceFlow id="f2" sourceRef="Task_PublicarAtividade" targetRef="Task_NotificarTurma" />
+    <bpmn:sequenceFlow id="f3" sourceRef="Task_NotificarTurma" targetRef="Task_EnviarEntrega" />
+    <bpmn:sequenceFlow id="f4" sourceRef="Task_EnviarEntrega" targetRef="Gw_DentroPrazo" />
+    <bpmn:sequenceFlow id="f5" name="Sim" sourceRef="Gw_DentroPrazo" targetRef="Task_RegistrarEntregue" />
+    <bpmn:sequenceFlow id="f6" name="Não" sourceRef="Gw_DentroPrazo" targetRef="Task_RegistrarAtrasada" />
+    <bpmn:sequenceFlow id="f7" sourceRef="Task_RegistrarEntregue" targetRef="Task_CorrigirEntrega" />
+    <bpmn:sequenceFlow id="f8" sourceRef="Task_RegistrarAtrasada" targetRef="Task_CorrigirEntrega" />
+    <bpmn:sequenceFlow id="f9" sourceRef="Task_CorrigirEntrega" targetRef="Task_PublicarNota" />
+    <bpmn:sequenceFlow id="f10" sourceRef="Task_PublicarNota" targetRef="Task_EmitirEvento" />
+    <bpmn:sequenceFlow id="f11" sourceRef="Task_EmitirEvento" targetRef="Task_ConsultarNota" />
+    <bpmn:sequenceFlow id="f12" sourceRef="Task_ConsultarNota" targetRef="End_Fim" />
+    <bpmn:textAnnotation id="Ann_RN07">
+      <bpmn:text>Cadência por estudante (RN07 / Modo Foco)</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="Ann_RN03">
+      <bpmn:text>Prazo aceita ou bloqueia atraso (RN03)</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="Ann_RN05">
+      <bpmn:text>Nota só visível após publicação (RN05)</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Assoc_Ann_RN07" sourceRef="Task_NotificarTurma" targetRef="Ann_RN07" />
+    <bpmn:association id="Assoc_Ann_RN03" sourceRef="Gw_DentroPrazo" targetRef="Ann_RN03" />
+    <bpmn:association id="Assoc_Ann_RN05" sourceRef="Task_PublicarNota" targetRef="Ann_RN05" />
+  </bpmn:process>
+  <bpmn:process id="Process_ModoFoco" name="Notificações Adaptativas (Modo Foco)" isExecutable="true">
+    <bpmn:laneSet id="LaneSet_Process_ModoFoco">
+      <bpmn:lane id="Lane_EstudanteMF" name="Estudante">
+        <bpmn:flowNodeRef>Start_AjustarNotif</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_AbrirPref</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SelecionarCadencia</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Aplicada</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_SistemaMF" name="Sistema">
+        <bpmn:flowNodeRef>Task_ValidarPref</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gw_PrefValida</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SalvarPref</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Invalida</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_AplicarMotor</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ConfirmarAluno</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_AjustarNotif" name="Quer ajustar notificações">
+      <bpmn:outgoing>g1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_AbrirPref" name="Abrir preferências de notificação">
+      <bpmn:incoming>g1</bpmn:incoming>
+      <bpmn:outgoing>g2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_SelecionarCadencia" name="Selecionar cadência de notificação">
+      <bpmn:incoming>g2</bpmn:incoming>
+      <bpmn:outgoing>g3</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Task_ValidarPref" name="Validar preferências">
+      <bpmn:incoming>g3</bpmn:incoming>
+      <bpmn:outgoing>g4</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gw_PrefValida" name="Configuração válida?">
+      <bpmn:incoming>g4</bpmn:incoming>
+      <bpmn:outgoing>g5</bpmn:outgoing>
+      <bpmn:outgoing>g6</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_SalvarPref" name="Salvar preferências (Modo Foco)">
+      <bpmn:incoming>g5</bpmn:incoming>
+      <bpmn:outgoing>g7</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="End_Invalida" name="Configuração inválida">
+      <bpmn:incoming>g6</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Task_AplicarMotor" name="Aplicar ao motor de eventos">
+      <bpmn:incoming>g7</bpmn:incoming>
+      <bpmn:outgoing>g8</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sendTask id="Task_ConfirmarAluno" name="Confirmar ao estudante">
+      <bpmn:incoming>g8</bpmn:incoming>
+      <bpmn:outgoing>g9</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="End_Aplicada" name="Preferências aplicadas">
+      <bpmn:incoming>g9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="g1" sourceRef="Start_AjustarNotif" targetRef="Task_AbrirPref" />
+    <bpmn:sequenceFlow id="g2" sourceRef="Task_AbrirPref" targetRef="Task_SelecionarCadencia" />
+    <bpmn:sequenceFlow id="g3" sourceRef="Task_SelecionarCadencia" targetRef="Task_ValidarPref" />
+    <bpmn:sequenceFlow id="g4" sourceRef="Task_ValidarPref" targetRef="Gw_PrefValida" />
+    <bpmn:sequenceFlow id="g5" name="Sim" sourceRef="Gw_PrefValida" targetRef="Task_SalvarPref" />
+    <bpmn:sequenceFlow id="g6" name="Não" sourceRef="Gw_PrefValida" targetRef="End_Invalida" />
+    <bpmn:sequenceFlow id="g7" sourceRef="Task_SalvarPref" targetRef="Task_AplicarMotor" />
+    <bpmn:sequenceFlow id="g8" sourceRef="Task_AplicarMotor" targetRef="Task_ConfirmarAluno" />
+    <bpmn:sequenceFlow id="g9" sourceRef="Task_ConfirmarAluno" targetRef="End_Aplicada" />
+    <bpmn:textAnnotation id="Ann_Cadencia">
+      <bpmn:text>Cadências configuráveis (RN07)</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="Ann_Inovacao">
+      <bpmn:text>Funcionalidade Inovadora: Modo Foco</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Assoc_Ann_Cadencia" sourceRef="Task_SelecionarCadencia" targetRef="Ann_Cadencia" />
+    <bpmn:association id="Assoc_Ann_Inovacao" sourceRef="Task_AplicarMotor" targetRef="Ann_Inovacao" />
+  </bpmn:process>
+  <bpmn:process id="Process_FormacaoGrupo" name="Formação de Grupo de Trabalho" isExecutable="true">
+    <bpmn:laneSet id="LaneSet_Process_FormacaoGrupo">
+      <bpmn:lane id="Lane_EstudanteGR" name="Estudante">
+        <bpmn:flowNodeRef>Start_GrupoDisp</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CriarEntrar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Aberto</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Pronto</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_SistemaGR" name="Sistema">
+        <bpmn:flowNodeRef>Task_ValidarRegras</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gw_FormacaoOk</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RegistrarMembro</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Recusada</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_NotificarMembros</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gw_Fechado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_TravarGrupo</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_GrupoDisp" name="Atividade em grupo disponível">
+      <bpmn:outgoing>h1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_CriarEntrar" name="Criar grupo ou entrar em grupo existente">
+      <bpmn:incoming>h1</bpmn:incoming>
+      <bpmn:outgoing>h2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Task_ValidarRegras" name="Validar regras (tamanho, 1 grupo por atividade)">
+      <bpmn:incoming>h2</bpmn:incoming>
+      <bpmn:outgoing>h3</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gw_FormacaoOk" name="Formação permitida?">
+      <bpmn:incoming>h3</bpmn:incoming>
+      <bpmn:outgoing>h4</bpmn:outgoing>
+      <bpmn:outgoing>h5</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_RegistrarMembro" name="Registrar participação no grupo">
+      <bpmn:incoming>h4</bpmn:incoming>
+      <bpmn:outgoing>h6</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="End_Recusada" name="Formação recusada">
+      <bpmn:incoming>h5</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sendTask id="Task_NotificarMembros" name="Notificar membros do grupo">
+      <bpmn:incoming>h6</bpmn:incoming>
+      <bpmn:outgoing>h7</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:exclusiveGateway id="Gw_Fechado" name="Grupo completo ou prazo encerrado?">
+      <bpmn:incoming>h7</bpmn:incoming>
+      <bpmn:outgoing>h8</bpmn:outgoing>
+      <bpmn:outgoing>h9</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_TravarGrupo" name="Travar grupo e habilitar entrega coletiva">
+      <bpmn:incoming>h9</bpmn:incoming>
+      <bpmn:outgoing>h10</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="End_Aberto" name="Grupo aberto (aguardando prazo)">
+      <bpmn:incoming>h8</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="End_Pronto" name="Grupo pronto para entrega">
+      <bpmn:incoming>h10</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="h1" sourceRef="Start_GrupoDisp" targetRef="Task_CriarEntrar" />
+    <bpmn:sequenceFlow id="h2" sourceRef="Task_CriarEntrar" targetRef="Task_ValidarRegras" />
+    <bpmn:sequenceFlow id="h3" sourceRef="Task_ValidarRegras" targetRef="Gw_FormacaoOk" />
+    <bpmn:sequenceFlow id="h4" name="Sim" sourceRef="Gw_FormacaoOk" targetRef="Task_RegistrarMembro" />
+    <bpmn:sequenceFlow id="h5" name="Não" sourceRef="Gw_FormacaoOk" targetRef="End_Recusada" />
+    <bpmn:sequenceFlow id="h6" sourceRef="Task_RegistrarMembro" targetRef="Task_NotificarMembros" />
+    <bpmn:sequenceFlow id="h7" sourceRef="Task_NotificarMembros" targetRef="Gw_Fechado" />
+    <bpmn:sequenceFlow id="h8" name="Não" sourceRef="Gw_Fechado" targetRef="End_Aberto" />
+    <bpmn:sequenceFlow id="h9" name="Sim" sourceRef="Gw_Fechado" targetRef="Task_TravarGrupo" />
+    <bpmn:sequenceFlow id="h10" sourceRef="Task_TravarGrupo" targetRef="End_Pronto" />
+    <bpmn:textAnnotation id="Ann_RN09">
+      <bpmn:text>Tamanho e 1 grupo por atividade (RN09)</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="Ann_RN10">
+      <bpmn:text>Entrega e nota por grupo (RN10)</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Assoc_Ann_RN09" sourceRef="Task_ValidarRegras" targetRef="Ann_RN09" />
+    <bpmn:association id="Assoc_Ann_RN10" sourceRef="Task_TravarGrupo" targetRef="Ann_RN10" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_Catedra">
+      <bpmndi:BPMNShape id="Pool_EntregaCorrecao_di" bpmnElement="Pool_EntregaCorrecao" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1916.0" height="560" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Pool_ModoFoco_di" bpmnElement="Pool_ModoFoco" isHorizontal="true">
+        <dc:Bounds x="160" y="840" width="1916.0" height="380" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Pool_FormacaoGrupo_di" bpmnElement="Pool_FormacaoGrupo" isHorizontal="true">
+        <dc:Bounds x="160" y="1260" width="1916.0" height="380" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Professor_di" bpmnElement="Lane_Professor" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="1886.0" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_SistemaEC_di" bpmnElement="Lane_SistemaEC" isHorizontal="true">
+        <dc:Bounds x="190" y="230" width="1886.0" height="260" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Estudante_di" bpmnElement="Lane_Estudante" isHorizontal="true">
+        <dc:Bounds x="190" y="490" width="1886.0" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_EstudanteMF_di" bpmnElement="Lane_EstudanteMF" isHorizontal="true">
+        <dc:Bounds x="190" y="840" width="1886.0" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_SistemaMF_di" bpmnElement="Lane_SistemaMF" isHorizontal="true">
+        <dc:Bounds x="190" y="990" width="1886.0" height="230" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_EstudanteGR_di" bpmnElement="Lane_EstudanteGR" isHorizontal="true">
+        <dc:Bounds x="190" y="1260" width="1886.0" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_SistemaGR_di" bpmnElement="Lane_SistemaGR" isHorizontal="true">
+        <dc:Bounds x="190" y="1410" width="1886.0" height="230" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_AtividadePronta_di" bpmnElement="Start_AtividadePronta">
+        <dc:Bounds x="280" y="137" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="253" y="177" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PublicarAtividade_di" bpmnElement="Task_PublicarAtividade" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="450" y="115" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_NotificarTurma_di" bpmnElement="Task_NotificarTurma" bioc:stroke="#b58900" bioc:fill="#fff2cc" color:background-color="#fff2cc" color:border-color="#b58900">
+        <dc:Bounds x="620" y="320" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EnviarEntrega_di" bpmnElement="Task_EnviarEntrega" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="790" y="525" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gw_DentroPrazo_di" bpmnElement="Gw_DentroPrazo" isMarkerVisible="true">
+        <dc:Bounds x="960" y="335" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="940" y="389" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegistrarEntregue_di" bpmnElement="Task_RegistrarEntregue" bioc:stroke="#5b176d" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#5b176d">
+        <dc:Bounds x="1130" y="260" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegistrarAtrasada_di" bpmnElement="Task_RegistrarAtrasada" bioc:stroke="#5b176d" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#5b176d">
+        <dc:Bounds x="1130" y="380" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CorrigirEntrega_di" bpmnElement="Task_CorrigirEntrega" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="1300" y="115" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PublicarNota_di" bpmnElement="Task_PublicarNota" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="1470" y="115" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EmitirEvento_di" bpmnElement="Task_EmitirEvento" bioc:stroke="#b58900" bioc:fill="#fff2cc" color:background-color="#fff2cc" color:border-color="#b58900">
+        <dc:Bounds x="1640" y="320" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ConsultarNota_di" bpmnElement="Task_ConsultarNota" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="1810" y="525" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Fim_di" bpmnElement="End_Fim">
+        <dc:Bounds x="1980" y="547" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1953" y="587" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_AjustarNotif_di" bpmnElement="Start_AjustarNotif">
+        <dc:Bounds x="280" y="897" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="253" y="937" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AbrirPref_di" bpmnElement="Task_AbrirPref" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="450" y="875" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SelecionarCadencia_di" bpmnElement="Task_SelecionarCadencia" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="620" y="875" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ValidarPref_di" bpmnElement="Task_ValidarPref" bioc:stroke="#5b176d" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#5b176d">
+        <dc:Bounds x="790" y="1065" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gw_PrefValida_di" bpmnElement="Gw_PrefValida" isMarkerVisible="true">
+        <dc:Bounds x="960" y="1080" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="940" y="1134" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SalvarPref_di" bpmnElement="Task_SalvarPref" bioc:stroke="#5b176d" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#5b176d">
+        <dc:Bounds x="1130" y="1065" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Invalida_di" bpmnElement="End_Invalida">
+        <dc:Bounds x="1130" y="1147" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1103" y="1187" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AplicarMotor_di" bpmnElement="Task_AplicarMotor" bioc:stroke="#5b176d" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#5b176d">
+        <dc:Bounds x="1300" y="1065" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ConfirmarAluno_di" bpmnElement="Task_ConfirmarAluno" bioc:stroke="#b58900" bioc:fill="#fff2cc" color:background-color="#fff2cc" color:border-color="#b58900">
+        <dc:Bounds x="1470" y="1065" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Aplicada_di" bpmnElement="End_Aplicada">
+        <dc:Bounds x="1640" y="897" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1613" y="937" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_GrupoDisp_di" bpmnElement="Start_GrupoDisp">
+        <dc:Bounds x="280" y="1317" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="253" y="1357" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CriarEntrar_di" bpmnElement="Task_CriarEntrar" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="450" y="1295" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ValidarRegras_di" bpmnElement="Task_ValidarRegras" bioc:stroke="#5b176d" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#5b176d">
+        <dc:Bounds x="620" y="1485" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gw_FormacaoOk_di" bpmnElement="Gw_FormacaoOk" isMarkerVisible="true">
+        <dc:Bounds x="790" y="1500" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="770" y="1554" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegistrarMembro_di" bpmnElement="Task_RegistrarMembro" bioc:stroke="#5b176d" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#5b176d">
+        <dc:Bounds x="960" y="1485" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Recusada_di" bpmnElement="End_Recusada">
+        <dc:Bounds x="960" y="1567" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="933" y="1607" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_NotificarMembros_di" bpmnElement="Task_NotificarMembros" bioc:stroke="#b58900" bioc:fill="#fff2cc" color:background-color="#fff2cc" color:border-color="#b58900">
+        <dc:Bounds x="1130" y="1485" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gw_Fechado_di" bpmnElement="Gw_Fechado" isMarkerVisible="true">
+        <dc:Bounds x="1300" y="1500" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1280" y="1554" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_TravarGrupo_di" bpmnElement="Task_TravarGrupo" bioc:stroke="#5b176d" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#5b176d">
+        <dc:Bounds x="1470" y="1485" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Aberto_di" bpmnElement="End_Aberto">
+        <dc:Bounds x="1470" y="1317" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1443" y="1357" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Pronto_di" bpmnElement="End_Pronto">
+        <dc:Bounds x="1640" y="1317" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1613" y="1357" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ann_RN07_di" bpmnElement="Ann_RN07">
+        <dc:Bounds x="600" y="690" width="185" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ann_RN03_di" bpmnElement="Ann_RN03">
+        <dc:Bounds x="925" y="690" width="175" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ann_RN05_di" bpmnElement="Ann_RN05">
+        <dc:Bounds x="1450" y="690" width="185" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ann_Cadencia_di" bpmnElement="Ann_Cadencia">
+        <dc:Bounds x="625" y="1160" width="165" height="52" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ann_Inovacao_di" bpmnElement="Ann_Inovacao">
+        <dc:Bounds x="1290" y="1160" width="180" height="52" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ann_RN09_di" bpmnElement="Ann_RN09">
+        <dc:Bounds x="625" y="1660" width="175" height="52" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ann_RN10_di" bpmnElement="Ann_RN10">
+        <dc:Bounds x="1455" y="1660" width="175" height="52" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="f1_di" bpmnElement="f1">
+        <di:waypoint x="316" y="155" />
+        <di:waypoint x="450" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="f2_di" bpmnElement="f2">
+        <di:waypoint x="560" y="155" />
+        <di:waypoint x="590" y="155" />
+        <di:waypoint x="590" y="360" />
+        <di:waypoint x="620" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="f3_di" bpmnElement="f3">
+        <di:waypoint x="730" y="360" />
+        <di:waypoint x="760" y="360" />
+        <di:waypoint x="760" y="565" />
+        <di:waypoint x="790" y="565" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="f4_di" bpmnElement="f4">
+        <di:waypoint x="900" y="565" />
+        <di:waypoint x="930" y="565" />
+        <di:waypoint x="930" y="360" />
+        <di:waypoint x="960" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="f5_di" bpmnElement="f5">
+        <di:waypoint x="1010" y="360" />
+        <di:waypoint x="1070" y="360" />
+        <di:waypoint x="1070" y="300" />
+        <di:waypoint x="1130" y="300" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1060" y="322" width="40" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="f6_di" bpmnElement="f6">
+        <di:waypoint x="1010" y="360" />
+        <di:waypoint x="1070" y="360" />
+        <di:waypoint x="1070" y="420" />
+        <di:waypoint x="1130" y="420" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1060" y="382" width="40" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="f7_di" bpmnElement="f7">
+        <di:waypoint x="1240" y="300" />
+        <di:waypoint x="1270" y="300" />
+        <di:waypoint x="1270" y="155" />
+        <di:waypoint x="1300" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="f8_di" bpmnElement="f8">
+        <di:waypoint x="1240" y="420" />
+        <di:waypoint x="1270" y="420" />
+        <di:waypoint x="1270" y="155" />
+        <di:waypoint x="1300" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="f9_di" bpmnElement="f9">
+        <di:waypoint x="1410" y="155" />
+        <di:waypoint x="1470" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="f10_di" bpmnElement="f10">
+        <di:waypoint x="1580" y="155" />
+        <di:waypoint x="1610" y="155" />
+        <di:waypoint x="1610" y="360" />
+        <di:waypoint x="1640" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="f11_di" bpmnElement="f11">
+        <di:waypoint x="1750" y="360" />
+        <di:waypoint x="1780" y="360" />
+        <di:waypoint x="1780" y="565" />
+        <di:waypoint x="1810" y="565" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="f12_di" bpmnElement="f12">
+        <di:waypoint x="1920" y="565" />
+        <di:waypoint x="1980" y="565" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Assoc_Ann_RN07_di" bpmnElement="Assoc_Ann_RN07">
+        <di:waypoint x="675" y="400" />
+        <di:waypoint x="692" y="690" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Assoc_Ann_RN03_di" bpmnElement="Assoc_Ann_RN03">
+        <di:waypoint x="985" y="385" />
+        <di:waypoint x="1012" y="690" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Assoc_Ann_RN05_di" bpmnElement="Assoc_Ann_RN05">
+        <di:waypoint x="1525" y="195" />
+        <di:waypoint x="1542" y="690" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="g1_di" bpmnElement="g1">
+        <di:waypoint x="316" y="915" />
+        <di:waypoint x="450" y="915" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="g2_di" bpmnElement="g2">
+        <di:waypoint x="560" y="915" />
+        <di:waypoint x="620" y="915" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="g3_di" bpmnElement="g3">
+        <di:waypoint x="730" y="915" />
+        <di:waypoint x="760" y="915" />
+        <di:waypoint x="760" y="1105" />
+        <di:waypoint x="790" y="1105" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="g4_di" bpmnElement="g4">
+        <di:waypoint x="900" y="1105" />
+        <di:waypoint x="960" y="1105" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="g5_di" bpmnElement="g5">
+        <di:waypoint x="1010" y="1105" />
+        <di:waypoint x="1130" y="1105" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1016" y="1087" width="40" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="g6_di" bpmnElement="g6">
+        <di:waypoint x="1010" y="1105" />
+        <di:waypoint x="1070" y="1105" />
+        <di:waypoint x="1070" y="1165" />
+        <di:waypoint x="1130" y="1165" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1060" y="1127" width="40" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="g7_di" bpmnElement="g7">
+        <di:waypoint x="1240" y="1105" />
+        <di:waypoint x="1300" y="1105" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="g8_di" bpmnElement="g8">
+        <di:waypoint x="1410" y="1105" />
+        <di:waypoint x="1470" y="1105" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="g9_di" bpmnElement="g9">
+        <di:waypoint x="1580" y="1105" />
+        <di:waypoint x="1610" y="1105" />
+        <di:waypoint x="1610" y="915" />
+        <di:waypoint x="1640" y="915" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Assoc_Ann_Cadencia_di" bpmnElement="Assoc_Ann_Cadencia">
+        <di:waypoint x="675" y="955" />
+        <di:waypoint x="707" y="1160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Assoc_Ann_Inovacao_di" bpmnElement="Assoc_Ann_Inovacao">
+        <di:waypoint x="1355" y="1145" />
+        <di:waypoint x="1380" y="1160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="h1_di" bpmnElement="h1">
+        <di:waypoint x="316" y="1335" />
+        <di:waypoint x="450" y="1335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="h2_di" bpmnElement="h2">
+        <di:waypoint x="560" y="1335" />
+        <di:waypoint x="590" y="1335" />
+        <di:waypoint x="590" y="1525" />
+        <di:waypoint x="620" y="1525" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="h3_di" bpmnElement="h3">
+        <di:waypoint x="730" y="1525" />
+        <di:waypoint x="790" y="1525" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="h4_di" bpmnElement="h4">
+        <di:waypoint x="840" y="1525" />
+        <di:waypoint x="960" y="1525" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="846" y="1507" width="40" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="h5_di" bpmnElement="h5">
+        <di:waypoint x="840" y="1525" />
+        <di:waypoint x="900" y="1525" />
+        <di:waypoint x="900" y="1585" />
+        <di:waypoint x="960" y="1585" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="890" y="1547" width="40" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="h6_di" bpmnElement="h6">
+        <di:waypoint x="1070" y="1525" />
+        <di:waypoint x="1130" y="1525" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="h7_di" bpmnElement="h7">
+        <di:waypoint x="1240" y="1525" />
+        <di:waypoint x="1300" y="1525" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="h8_di" bpmnElement="h8">
+        <di:waypoint x="1350" y="1525" />
+        <di:waypoint x="1410" y="1525" />
+        <di:waypoint x="1410" y="1335" />
+        <di:waypoint x="1470" y="1335" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1400" y="1422" width="40" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="h9_di" bpmnElement="h9">
+        <di:waypoint x="1350" y="1525" />
+        <di:waypoint x="1470" y="1525" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1356" y="1507" width="40" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="h10_di" bpmnElement="h10">
+        <di:waypoint x="1580" y="1525" />
+        <di:waypoint x="1610" y="1525" />
+        <di:waypoint x="1610" y="1335" />
+        <di:waypoint x="1640" y="1335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Assoc_Ann_RN09_di" bpmnElement="Assoc_Ann_RN09">
+        <di:waypoint x="675" y="1565" />
+        <di:waypoint x="712" y="1660" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Assoc_Ann_RN10_di" bpmnElement="Assoc_Ann_RN10">
+        <di:waypoint x="1525" y="1565" />
+        <di:waypoint x="1542" y="1660" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

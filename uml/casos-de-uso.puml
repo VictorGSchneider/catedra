@@ -1,0 +1,90 @@
+@startuml casos-de-uso
+title Cátedra - Diagrama de Casos de Uso
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam shadowing false
+skinparam usecase {
+  BackgroundColor #FDF6E3
+  BorderColor #5a3e1b
+}
+
+actor "Estudante" as Est
+actor "Professor" as Prof
+actor "Coordenador" as Coord
+actor "Administrador" as Admin
+
+rectangle "Cátedra" {
+  usecase "Autenticar-se" as UC0
+  usecase "Criar Turma" as UC1
+  usecase "Matricular-se na Turma" as UC2
+  usecase "Publicar Atividade" as UC3
+  usecase "Entregar Atividade" as UC4
+  usecase "Corrigir Entrega" as UC5
+  usecase "Publicar Nota" as UC6
+  usecase "Consultar Nota e Feedback" as UC7
+  usecase "Postar Aviso no Mural" as UC8
+  usecase "Configurar Notificações\n(Modo Foco)" as UC9
+  usecase "Consultar Painel de Carga" as UC10
+  usecase "Acompanhar Turmas do Curso\n(somente leitura)" as UC11
+  usecase "Gerenciar Usuários e Papéis" as UC12
+  usecase "Formar e Gerenciar Grupo" as UC13
+  usecase "Configurar Trabalho em Grupo" as UC14
+}
+
+' Todos autenticam
+Est --> UC0
+Prof --> UC0
+Coord --> UC0
+Admin --> UC0
+
+' Professor
+Prof --> UC1
+Prof --> UC3
+Prof --> UC5
+Prof --> UC6
+Prof --> UC8
+
+' Estudante
+Est --> UC2
+Est --> UC4
+Est --> UC7
+Est --> UC9
+Est --> UC10
+Est --> UC13
+
+' Professor (trabalho em grupo)
+Prof --> UC14
+
+' Coordenador
+Coord --> UC11
+
+' Administrador
+Admin --> UC12
+
+' Relações entre casos de uso
+UC6 ..> UC5 : <<extend>>
+UC4 ..> UC2 : <<include>>
+UC3 ..> UC1 : <<include>>
+UC13 ..> UC2 : <<include>>
+UC14 ..> UC3 : <<extend>>
+
+note bottom of UC6
+  RN05: nota só visível
+  ao estudante após
+  publicação da correção
+end note
+
+note bottom of UC9
+  RN07: notificações respeitam
+  a cadência configurada
+end note
+
+note bottom of UC13
+  RN09/RN10: tamanho do grupo,
+  1 grupo por atividade e
+  entrega/nota por grupo
+end note
+
+@enduml
