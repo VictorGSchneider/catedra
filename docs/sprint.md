@@ -17,17 +17,24 @@ projetar (BPMN, casos de uso, arquitetura, C4, decisões) o sistema Cátedra.
 > A evidência individual fica registrada no histórico de commits do GitHub e na
 > movimentação dos cartões do quadro (GitHub Projects).
 
+> A inovação de **Grupos de Trabalho** (colaboração) foi um esforço
+> **transversal**: permeia requisitos (RN04/RN09/RN10), histórias (US09/US10),
+> modelagem (processo *Formação de Grupo* no BPMN) e arquitetura (módulo do
+> monólito + eventos no pub-sub). O roteiro de apresentação
+> (`apresentacao/roteiro.md`) foi consolidado pela equipe.
+
 ## Principais decisões tomadas
 
 1. **Escolha do estilo arquitetural híbrido** (camadas + publish-subscribe) em
    vez de microserviços, por ser proporcional ao contexto de uma instituição
    (ver ADR-001).
-2. **Funcionalidade inovadora = Modo Foco** (camada adaptativa de engajamento),
-   escolhida por atacar uma lacuna real dos concorrentes e por ter alta
-   viabilidade técnica.
-3. **Recorte enxuto do MVP**: incluir apenas a fatia barata e de maior impacto
-   do diferencial (cadência de notificação + painel de carga), adiando as partes
-   caras.
+2. **Duas funcionalidades inovadoras** — **Modo Foco** (camada adaptativa de
+   engajamento) e **Grupos de Trabalho** (camada de colaboração) —, escolhidas
+   por atacarem lacunas reais dos concorrentes e por terem alta viabilidade técnica.
+3. **Recorte enxuto do MVP**: dos diferenciais, incluir apenas a fatia barata e
+   de maior impacto (do Modo Foco, a cadência de notificação + painel de carga;
+   dos Grupos de Trabalho, formar grupo + entrega/nota por grupo), adiando as
+   partes caras.
 4. **Stack** Vue + FastAPI + PostgreSQL, por domínio da equipe e adequação ao
    desenho em camadas.
 

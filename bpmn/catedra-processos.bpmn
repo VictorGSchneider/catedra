@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_Catedra" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Claude AI" exporterVersion="1.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_Catedra" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Catedra BPMN Generator" exporterVersion="1.0">
   <bpmn:collaboration id="Collaboration_Catedra">
     <bpmn:participant id="Pool_EntregaCorrecao" name="Entrega e Correção de Atividade" processRef="Process_EntregaCorrecao" />
     <bpmn:participant id="Pool_ModoFoco" name="Notificações Adaptativas (Modo Foco)" processRef="Process_ModoFoco" />
@@ -13,17 +13,17 @@
         <bpmn:flowNodeRef>Task_CorrigirEntrega</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Task_PublicarNota</bpmn:flowNodeRef>
       </bpmn:lane>
+      <bpmn:lane id="Lane_Estudante" name="Estudante">
+        <bpmn:flowNodeRef>Task_EnviarEntrega</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ConsultarNota</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Fim</bpmn:flowNodeRef>
+      </bpmn:lane>
       <bpmn:lane id="Lane_SistemaEC" name="Sistema">
         <bpmn:flowNodeRef>Task_NotificarTurma</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gw_DentroPrazo</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Task_RegistrarEntregue</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Task_RegistrarAtrasada</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Task_EmitirEvento</bpmn:flowNodeRef>
-      </bpmn:lane>
-      <bpmn:lane id="Lane_Estudante" name="Estudante">
-        <bpmn:flowNodeRef>Task_EnviarEntrega</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Task_ConsultarNota</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>End_Fim</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
     <bpmn:startEvent id="Start_AtividadePronta" name="Atividade pronta">
@@ -265,11 +265,11 @@
       <bpmndi:BPMNShape id="Lane_Professor_di" bpmnElement="Lane_Professor" isHorizontal="true">
         <dc:Bounds x="190" y="80" width="1886.0" height="150" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Lane_SistemaEC_di" bpmnElement="Lane_SistemaEC" isHorizontal="true">
-        <dc:Bounds x="190" y="230" width="1886.0" height="260" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_Estudante_di" bpmnElement="Lane_Estudante" isHorizontal="true">
-        <dc:Bounds x="190" y="490" width="1886.0" height="150" />
+        <dc:Bounds x="190" y="230" width="1886.0" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_SistemaEC_di" bpmnElement="Lane_SistemaEC" isHorizontal="true">
+        <dc:Bounds x="190" y="380" width="1886.0" height="260" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_EstudanteMF_di" bpmnElement="Lane_EstudanteMF" isHorizontal="true">
         <dc:Bounds x="190" y="840" width="1886.0" height="150" />
@@ -293,22 +293,22 @@
         <dc:Bounds x="450" y="115" width="110" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_NotificarTurma_di" bpmnElement="Task_NotificarTurma" bioc:stroke="#b58900" bioc:fill="#fff2cc" color:background-color="#fff2cc" color:border-color="#b58900">
-        <dc:Bounds x="620" y="320" width="110" height="80" />
+        <dc:Bounds x="620" y="470" width="110" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_EnviarEntrega_di" bpmnElement="Task_EnviarEntrega" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
-        <dc:Bounds x="790" y="525" width="110" height="80" />
+        <dc:Bounds x="790" y="265" width="110" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gw_DentroPrazo_di" bpmnElement="Gw_DentroPrazo" isMarkerVisible="true">
-        <dc:Bounds x="960" y="335" width="50" height="50" />
+        <dc:Bounds x="960" y="485" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="940" y="389" width="90" height="27" />
+          <dc:Bounds x="940" y="539" width="90" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_RegistrarEntregue_di" bpmnElement="Task_RegistrarEntregue" bioc:stroke="#5b176d" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#5b176d">
-        <dc:Bounds x="1130" y="260" width="110" height="80" />
+        <dc:Bounds x="1130" y="410" width="110" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_RegistrarAtrasada_di" bpmnElement="Task_RegistrarAtrasada" bioc:stroke="#5b176d" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#5b176d">
-        <dc:Bounds x="1130" y="380" width="110" height="80" />
+        <dc:Bounds x="1130" y="530" width="110" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_CorrigirEntrega_di" bpmnElement="Task_CorrigirEntrega" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
         <dc:Bounds x="1300" y="115" width="110" height="80" />
@@ -317,15 +317,15 @@
         <dc:Bounds x="1470" y="115" width="110" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_EmitirEvento_di" bpmnElement="Task_EmitirEvento" bioc:stroke="#b58900" bioc:fill="#fff2cc" color:background-color="#fff2cc" color:border-color="#b58900">
-        <dc:Bounds x="1640" y="320" width="110" height="80" />
+        <dc:Bounds x="1640" y="470" width="110" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_ConsultarNota_di" bpmnElement="Task_ConsultarNota" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
-        <dc:Bounds x="1810" y="525" width="110" height="80" />
+        <dc:Bounds x="1810" y="265" width="110" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="End_Fim_di" bpmnElement="End_Fim">
-        <dc:Bounds x="1980" y="547" width="36" height="36" />
+        <dc:Bounds x="1980" y="287" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1953" y="587" width="90" height="27" />
+          <dc:Bounds x="1953" y="327" width="90" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Start_AjustarNotif_di" bpmnElement="Start_AjustarNotif">
@@ -449,48 +449,48 @@
       <bpmndi:BPMNEdge id="f2_di" bpmnElement="f2">
         <di:waypoint x="560" y="155" />
         <di:waypoint x="590" y="155" />
-        <di:waypoint x="590" y="360" />
-        <di:waypoint x="620" y="360" />
+        <di:waypoint x="590" y="510" />
+        <di:waypoint x="620" y="510" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="f3_di" bpmnElement="f3">
-        <di:waypoint x="730" y="360" />
-        <di:waypoint x="760" y="360" />
-        <di:waypoint x="760" y="565" />
-        <di:waypoint x="790" y="565" />
+        <di:waypoint x="730" y="510" />
+        <di:waypoint x="760" y="510" />
+        <di:waypoint x="760" y="305" />
+        <di:waypoint x="790" y="305" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="f4_di" bpmnElement="f4">
-        <di:waypoint x="900" y="565" />
-        <di:waypoint x="930" y="565" />
-        <di:waypoint x="930" y="360" />
-        <di:waypoint x="960" y="360" />
+        <di:waypoint x="900" y="305" />
+        <di:waypoint x="930" y="305" />
+        <di:waypoint x="930" y="510" />
+        <di:waypoint x="960" y="510" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="f5_di" bpmnElement="f5">
-        <di:waypoint x="1010" y="360" />
-        <di:waypoint x="1070" y="360" />
-        <di:waypoint x="1070" y="300" />
-        <di:waypoint x="1130" y="300" />
+        <di:waypoint x="1010" y="510" />
+        <di:waypoint x="1070" y="510" />
+        <di:waypoint x="1070" y="450" />
+        <di:waypoint x="1130" y="450" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1060" y="322" width="40" height="20" />
+          <dc:Bounds x="1060" y="472" width="40" height="20" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="f6_di" bpmnElement="f6">
-        <di:waypoint x="1010" y="360" />
-        <di:waypoint x="1070" y="360" />
-        <di:waypoint x="1070" y="420" />
-        <di:waypoint x="1130" y="420" />
+        <di:waypoint x="1010" y="510" />
+        <di:waypoint x="1070" y="510" />
+        <di:waypoint x="1070" y="570" />
+        <di:waypoint x="1130" y="570" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1060" y="382" width="40" height="20" />
+          <dc:Bounds x="1060" y="532" width="40" height="20" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="f7_di" bpmnElement="f7">
-        <di:waypoint x="1240" y="300" />
-        <di:waypoint x="1270" y="300" />
+        <di:waypoint x="1240" y="450" />
+        <di:waypoint x="1270" y="450" />
         <di:waypoint x="1270" y="155" />
         <di:waypoint x="1300" y="155" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="f8_di" bpmnElement="f8">
-        <di:waypoint x="1240" y="420" />
-        <di:waypoint x="1270" y="420" />
+        <di:waypoint x="1240" y="570" />
+        <di:waypoint x="1270" y="570" />
         <di:waypoint x="1270" y="155" />
         <di:waypoint x="1300" y="155" />
       </bpmndi:BPMNEdge>
@@ -501,25 +501,25 @@
       <bpmndi:BPMNEdge id="f10_di" bpmnElement="f10">
         <di:waypoint x="1580" y="155" />
         <di:waypoint x="1610" y="155" />
-        <di:waypoint x="1610" y="360" />
-        <di:waypoint x="1640" y="360" />
+        <di:waypoint x="1610" y="510" />
+        <di:waypoint x="1640" y="510" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="f11_di" bpmnElement="f11">
-        <di:waypoint x="1750" y="360" />
-        <di:waypoint x="1780" y="360" />
-        <di:waypoint x="1780" y="565" />
-        <di:waypoint x="1810" y="565" />
+        <di:waypoint x="1750" y="510" />
+        <di:waypoint x="1780" y="510" />
+        <di:waypoint x="1780" y="305" />
+        <di:waypoint x="1810" y="305" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="f12_di" bpmnElement="f12">
-        <di:waypoint x="1920" y="565" />
-        <di:waypoint x="1980" y="565" />
+        <di:waypoint x="1920" y="305" />
+        <di:waypoint x="1980" y="305" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Assoc_Ann_RN07_di" bpmnElement="Assoc_Ann_RN07">
-        <di:waypoint x="675" y="400" />
+        <di:waypoint x="675" y="550" />
         <di:waypoint x="692" y="690" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Assoc_Ann_RN03_di" bpmnElement="Assoc_Ann_RN03">
-        <di:waypoint x="985" y="385" />
+        <di:waypoint x="985" y="535" />
         <di:waypoint x="1012" y="690" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Assoc_Ann_RN05_di" bpmnElement="Assoc_Ann_RN05">
