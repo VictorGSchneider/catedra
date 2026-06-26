@@ -14,5 +14,5 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Observação: os artefatos renderiados (*.png, *.bpmn, ENTREGA-catedra.pdf)
+# Observação: os artefatos renderizados (*.png, *.bpmn, ENTREGA-catedra.pdf)
 # SÃO versionados de propósito, para ficarem visíveis no GitHub.

@@ -51,7 +51,7 @@ integrantes = (
 story.append(Paragraph(integrantes, value))
 
 story.append(Paragraph("Link do GitHub", label))
-story.append(Paragraph("[inserir link do repositório]", value))
+story.append(Paragraph("https://github.com/victorgschneider/catedra", value))
 
 story.append(Paragraph("Link do Gestor de Projetos", label))
 story.append(Paragraph("[inserir link do GitHub Projects]", value))

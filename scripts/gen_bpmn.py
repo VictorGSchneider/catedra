@@ -41,7 +41,7 @@ shapes = {}   # id -> dict(x,y,w,h,label,fill,stroke,stype,marker)
 edges = {}    # id -> dict(src,tgt,name,wp=[(x,y)..],label_xy)
 pools = []    # dict(id,name,proc,x,y,w,h)
 lanes = []    # dict(id,name,pool,x,y,w,h,refs=[])
-processes = {}  # proc_id -> dict(name, nodes=[], flows=[], lanes=[], annos=[], assocs=[], datastores=[], dataouts=[])
+processes = {}  # proc_id -> dict(name, nodes=[], flows=[], lanes=[], annos=[], assocs=[])
 
 def col_x(c):
     return X0 + c * COL_W
@@ -62,7 +62,7 @@ def add_pool(pid, name, proc_id, y, lane_specs):
     """lane_specs: list of (lane_id, lane_name, height, [centers dict])"""
     total_h = sum(h for _, _, h, _ in lane_specs)
     processes[proc_id] = dict(name=name, nodes=[], flows=[], lanes=[],
-                              annos=[], assocs=[], datastores=[], dataouts=[])
+                              annos=[], assocs=[])
     p = dict(id=pid, name=name, proc=proc_id, y=y, h=total_h)
     pools.append(p)
     cur = y
@@ -119,19 +119,6 @@ def add_anno(proc_id, aid, text, x, y, w, h, attach_to):
     edges[assoc_id] = dict(src=attach_to, tgt=aid, name="", dashed=True,
                            wp=[(sx, sy), (ax, ay)], label_xy=None)
 
-def add_datastore(proc_id, dsid, name, x, y):
-    shapes[dsid] = dict(x=x, y=y, w=50, h=50, label=name, stype="datastore",
-                        fill="#ffffff", stroke="#666666", marker=None)
-    processes[proc_id]["datastores"].append(dict(id=dsid, name=name))
-
-def add_dataout(proc_id, doid, src_task, datastore):
-    processes[proc_id]["dataouts"].append(dict(id=doid, task=src_task, ds=datastore))
-    s = shapes[src_task]; d = shapes[datastore]
-    sx = s["x"] + s["w"]/2; sy = s["y"] + s["h"]
-    dx = d["x"] + d["w"]/2; dy = d["y"]
-    edges[doid] = dict(src=src_task, tgt=datastore, name="", dashed=True,
-                       wp=[(sx, sy), (dx, dy)], label_xy=None)
-
 # ----------------------------------------------------------------------
 # Roteamento ortogonal de arestas (Z-route)
 # ----------------------------------------------------------------------
@@ -156,8 +143,8 @@ def route(src, tgt):
 P1 = "Process_EntregaCorrecao"
 add_pool("Pool_EntregaCorrecao", "Entrega e Correção de Atividade", P1, 80,
          [("Lane_Professor", "Professor", 150, None),
-          ("Lane_SistemaEC", "Sistema", 260, None),
-          ("Lane_Estudante", "Estudante", 150, None)])
+          ("Lane_Estudante", "Estudante", 150, None),
+          ("Lane_SistemaEC", "Sistema", 260, None)])
 
 # nós
 add_node(P1, "Start_AtividadePronta", "event", "start", "Lane_Professor", 0, "mid",
@@ -312,22 +299,6 @@ for l in lanes:
 # ======================================================================
 # EMISSÃO DO XML
 # ======================================================================
-def el_node(n):
-    tag = {"start": "startEvent", "end": "endEvent",
-           "userTask": "userTask", "serviceTask": "serviceTask",
-           "sendTask": "sendTask", "exclusiveGateway": "exclusiveGateway"}[n["kind"]]
-    name = escape(n["name"])
-    lines = [f'    <bpmn:{tag} id="{n["id"]}" name="{name}">']
-    for i in n["inc"]:
-        lines.append(f'      <bpmn:incoming>{i}</bpmn:incoming>')
-    for o in n["out"]:
-        lines.append(f'      <bpmn:outgoing>{o}</bpmn:outgoing>')
-    # data output association (dentro da serviceTask)
-    for do in processes_cur["dataouts"] if False else []:
-        pass
-    lines.append(f'    </bpmn:{tag}>')
-    return "\n".join(lines)
-
 def build_process_xml(proc_id):
     pr = processes[proc_id]
     out = [f'  <bpmn:process id="{proc_id}" name="{escape(pr["name"])}" isExecutable="true">']
@@ -340,13 +311,7 @@ def build_process_xml(proc_id):
             out.append(f'        <bpmn:flowNodeRef>{ref}</bpmn:flowNodeRef>')
         out.append('      </bpmn:lane>')
     out.append('    </bpmn:laneSet>')
-    # data stores
-    for ds in pr["datastores"]:
-        out.append(f'    <bpmn:dataStoreReference id="{ds["id"]}" name="{escape(ds["name"])}" />')
     # nós
-    dataouts_by_task = {}
-    for do in pr["dataouts"]:
-        dataouts_by_task.setdefault(do["task"], []).append(do)
     for n in pr["nodes"]:
         tag = {"start": "startEvent", "end": "endEvent",
                "userTask": "userTask", "serviceTask": "serviceTask",
@@ -356,10 +321,6 @@ def build_process_xml(proc_id):
             out.append(f'      <bpmn:incoming>{i}</bpmn:incoming>')
         for o in n["out"]:
             out.append(f'      <bpmn:outgoing>{o}</bpmn:outgoing>')
-        for do in dataouts_by_task.get(n["id"], []):
-            out.append(f'      <bpmn:dataOutputAssociation id="{do["id"]}">')
-            out.append(f'        <bpmn:targetRef>{do["ds"]}</bpmn:targetRef>')
-            out.append('      </bpmn:dataOutputAssociation>')
         out.append(f'    </bpmn:{tag}>')
     # fluxos
     for f in pr["flows"]:
@@ -390,7 +351,7 @@ def build_di():
         out.append('      </bpmndi:BPMNShape>')
     # nós (shapes)
     for nid, s in shapes.items():
-        if s["stype"] in ("anno", "datastore"):
+        if s["stype"] == "anno":
             continue
         color_attr = ""
         if s["stype"] == "task" or (s["stype"] == "gateway"):
@@ -407,16 +368,6 @@ def build_di():
             out.append('        <bpmndi:BPMNLabel>')
             out.append(f'          <dc:Bounds x="{lx}" y="{ly}" width="90" height="27" />')
             out.append('        </bpmndi:BPMNLabel>')
-        out.append('      </bpmndi:BPMNShape>')
-    # datastores
-    for nid, s in shapes.items():
-        if s["stype"] != "datastore":
-            continue
-        out.append(f'      <bpmndi:BPMNShape id="{nid}_di" bpmnElement="{nid}">')
-        out.append(f'        <dc:Bounds x="{int(s["x"])}" y="{int(s["y"])}" width="50" height="50" />')
-        out.append('        <bpmndi:BPMNLabel>')
-        out.append(f'          <dc:Bounds x="{int(s["x"]-30)}" y="{int(s["y"]+52)}" width="110" height="27" />')
-        out.append('        </bpmndi:BPMNLabel>')
         out.append('      </bpmndi:BPMNShape>')
     # anotações
     for nid, s in shapes.items():
@@ -440,8 +391,6 @@ def build_di():
     out.append('  </bpmndi:BPMNDiagram>')
     return "\n".join(out)
 
-processes_cur = None  # (compat; não usado)
-
 header = ('<?xml version="1.0" encoding="UTF-8"?>\n'
           '<bpmn:definitions '
           'xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" '
@@ -452,7 +401,7 @@ header = ('<?xml version="1.0" encoding="UTF-8"?>\n'
           'xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" '
           'xmlns:camunda="http://camunda.org/schema/1.0/bpmn" '
           'id="Definitions_Catedra" targetNamespace="http://bpmn.io/schema/bpmn" '
-          'exporter="Claude AI" exporterVersion="1.0">')
+          'exporter="Catedra BPMN Generator" exporterVersion="1.0">')
 
 collab = ['  <bpmn:collaboration id="Collaboration_Catedra">']
 for p in pools:
@@ -537,10 +486,6 @@ def draw():
             ax.add_patch(Circle((cx, cy), s["w"]/2, facecolor="#fff",
                                 edgecolor=s["stroke"], lw=1.6))
             ax.text(cx, s["y"]+s["h"]+12, s["label"], ha="center", va="top", fontsize=6.5)
-        elif st == "datastore":
-            ax.add_patch(Rectangle((s["x"], s["y"]), s["w"], s["h"], facecolor="#fafafa",
-                                   edgecolor="#666", lw=1.0))
-            ax.text(cx, s["y"]+s["h"]+10, s["label"], ha="center", va="top", fontsize=6, color="#444")
         elif st == "anno":
             ax.add_patch(Rectangle((s["x"], s["y"]), s["w"], s["h"], facecolor="#fffef2",
                                    edgecolor="#999", lw=0.7, linestyle="--"))

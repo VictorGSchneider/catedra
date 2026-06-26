@@ -4,15 +4,18 @@ Atividades e Entregas,Epic,,Alta,,Backlog,Publicar atividades com prazo e recebe
 Correção e Notas,Epic,,Alta,,Backlog,Corrigir entregas e publicar notas com auditoria.
 Comunicação (Mural),Epic,,Média,,Backlog,Avisos da turma no mural.
 Modo Foco (Engajamento Adaptativo),Epic,,Alta,,Backlog,Notificações adaptativas e painel de carga (inovação).
+Grupos de Trabalho (Colaboração),Epic,,Alta,,Backlog,Formar/gerenciar grupos e tratar entrega e nota por grupo (inovação).
 Autenticação e Permissões,Epic,,Alta,,Backlog,Login JWT e autorização por papéis (RBAC).
 US01 - Criar turma,Story,Gestão de Turmas e Matrículas,Alta,3,To Do,Professor cria turma com código de convite (RN01).
 US02 - Matricular-se na turma,Story,Gestão de Turmas e Matrículas,Alta,2,To Do,Estudante entra na turma via código (RN02).
 US03 - Publicar atividade,Story,Atividades e Entregas,Alta,5,To Do,Professor publica atividade com prazo e anexos (RN03).
 US04 - Entregar atividade,Story,Atividades e Entregas,Alta,5,To Do,Estudante envia/reenvia entrega até o prazo (RN04).
-US05 - Corrigir e lançar nota,Story,Correção e Notas,Alta,5,To Do,Professor corrige e publica a nota (RN05 RN06).
+US05 - Corrigir e lançar nota,Story,Correção e Notas,Alta,5,To Do,Professor corrige e publica a nota (RN05 e RN06).
 US06 - Consultar nota e feedback,Story,Correção e Notas,Alta,2,To Do,Estudante consulta nota após publicação (RN05).
 US07 - Configurar notificações adaptativas,Story,Modo Foco (Engajamento Adaptativo),Alta,5,To Do,Estudante define cadência das notificações (RN07).
 US08 - Acompanhar turmas do curso,Story,Gestão de Turmas e Matrículas,Média,3,Backlog,Coordenador vê turmas em modo leitura (RN08).
+US09 - Formar e gerenciar grupo,Story,Grupos de Trabalho (Colaboração),Alta,5,To Do,Estudante cria ou entra em grupo respeitando tamanho e 1 grupo por atividade (RN09).
+US10 - Atividade e avaliação em grupo,Story,Grupos de Trabalho (Colaboração),Alta,5,To Do,Professor marca atividade em grupo e corrige/publica nota por grupo (RN09 e RN10).
 Painel de carga unificado,Story,Modo Foco (Engajamento Adaptativo),Alta,3,Backlog,Visão de prazos de todas as turmas (read model).
 Autenticação JWT,Story,Autenticação e Permissões,Alta,3,To Do,Login stateless via JWT (ADR-002).
 Autorização por papéis (RBAC),Story,Autenticação e Permissões,Alta,3,To Do,Controle de acesso por papel (ADR-002).
@@ -21,7 +24,7 @@ Barramento de eventos (pub-sub),Task,Modo Foco (Engajamento Adaptativo),Alta,5,B
 Visão do Produto,Task,,Alta,2,Done,Documento docs/visao-produto.md concluído.
 Stakeholders,Task,,Alta,1,Done,Documento docs/stakeholders.md concluído.
 Regras de Negócio + rastreabilidade,Task,,Alta,3,Done,Documento docs/regras-negocio.md com matriz de rastreabilidade.
-User Stories,Task,,Alta,3,Done,Documento docs/user-stories.md com 8 histórias.
+User Stories,Task,,Alta,3,Done,Documento docs/user-stories.md com 10 histórias.
 Definição do MVP,Task,,Alta,2,Done,Documento docs/mvp.md com priorização.
 BPMN - Entrega e Correção,Task,,Alta,3,Done,Modelagem do processo principal (bpmn/).
 Diagrama de Casos de Uso,Task,,Alta,2,Done,UML em uml/casos-de-uso.
